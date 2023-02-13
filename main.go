@@ -3,12 +3,16 @@ package main
 import (
 	"flag"
 	"fmt"
+
+	"github.com/RuneU/funtemps.git/conv"
 )
 
 // Definerer flag-variablene i hoved-"scope"
 var fahr float64
 var out string
 var funfacts string
+var kel float64
+var cel float64
 
 // Bruker init (som anbefalt i dokumentasjonen) for å sikre at flagvariablene
 // er initialisert.
@@ -28,13 +32,43 @@ func init() {
 	flag.StringVar(&funfacts, "funfacts", "sun", "\"fun-facts\" om sun - Solen, luna - Månen og terra - Jorden")
 	// Du må selv definere flag-variabelen for -t flagget, som bestemmer
 	// hvilken temperaturskala skal brukes når funfacts skal vises
+	flag.Float64Var(&kel, "K", 0.0, "temperatur i grader kelvin")
+	flag.Float64Var(&cel, "C", 0.0, "temperatur i grader celsius")
 
 }
 
 func main() {
 
 	flag.Parse()
+	if out == "C" && isFlagPassed("F") {
+		cel := conv.FarhenheitToCelsius(fahr)
+		fmt.Printf("%.2f°F is %.2f°C\n", fahr, cel)
+	}
 
+	if out == "F" && isFlagPassed("C") {
+		fahr := conv.CelsiusToFarhenheit(cel)
+		fmt.Printf("%.2f°C is %.2f°F\n", cel, fahr)
+	}
+
+	if out == "K" && isFlagPassed("C") {
+		kel := conv.CelsiusToKelvin(cel)
+		fmt.Printf("%.2f°C is %.2f°K\n", cel, kel)
+	}
+
+	if out == "C" && isFlagPassed("K") {
+		cel := conv.KelvinToCelsius(kel)
+		fmt.Printf("%.2f°K is %.2f°C\n", kel, cel)
+	}
+
+	if out == "F" && isFlagPassed("K") {
+		fahr := conv.KelvinToFarhenheit(kel)
+		fmt.Printf("%.2f°K is %.2f°F\n", kel, fahr)
+	}
+
+	if out == "K" && isFlagPassed("F") {
+		kelvin := conv.FarhenheitToKelvin(fahr)
+		fmt.Printf("%.2f°F is %.2f°K\n", fahr, kelvin)
+	}
 	/**
 	    Her må logikken for flaggene og kall til funksjoner fra conv og funfacts
 	    pakkene implementeres.
