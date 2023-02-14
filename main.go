@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/RuneU/funtemps.git/conv"
+	"github.com/RuneU/funtemps/conv"
 )
 
 // Definerer flag-variablene i hoved-"scope"
@@ -27,19 +27,27 @@ func init() {
 
 	// Definerer og initialiserer flagg-variablene
 	flag.Float64Var(&fahr, "F", 0.0, "temperatur i grader fahrenheit")
+	flag.Float64Var(&kel, "K", 0.0, "temperatur i grader kelvin")
+	flag.Float64Var(&cel, "C", 0.0, "temperatur i grader celsius")
 	// Du må selv definere flag-variablene for "C" og "K"
 	flag.StringVar(&out, "out", "C", "beregne temperatur i C - celsius, F - farhenheit, K- Kelvin")
 	flag.StringVar(&funfacts, "funfacts", "sun", "\"fun-facts\" om sun - Solen, luna - Månen og terra - Jorden")
 	// Du må selv definere flag-variabelen for -t flagget, som bestemmer
 	// hvilken temperaturskala skal brukes når funfacts skal vises
-	flag.Float64Var(&kel, "K", 0.0, "temperatur i grader kelvin")
-	flag.Float64Var(&cel, "C", 0.0, "temperatur i grader celsius")
-
 }
 
 func main() {
 
 	flag.Parse()
+
+	// Her er noen eksempler du kan bruke i den manuelle testingen
+	fmt.Println(fahr, out, funfacts)
+
+	fmt.Println("len(flag.Args())", len(flag.Args()))
+	fmt.Println("flag.NFlag()", flag.NFlag())
+
+	fmt.Println(isFlagPassed("out"))
+
 	if out == "C" && isFlagPassed("F") {
 		cel := conv.FarhenheitToCelsius(fahr)
 		fmt.Printf("%.2f°F is %.2f°C\n", fahr, cel)
@@ -91,21 +99,12 @@ func main() {
 	    beskrivelsene av flagg-variablene, som angitt i parameter fire til
 	    funksjonene Float64Var og StringVar
 	*/
-
-	// Her er noen eksempler du kan bruke i den manuelle testingen
-	fmt.Println(fahr, out, funfacts)
-
-	fmt.Println("len(flag.Args())", len(flag.Args()))
-	fmt.Println("flag.NFlag()", flag.NFlag())
-
-	fmt.Println(isFlagPassed("out"))
-
 	// Eksempel på enkel logikk
-	if out == "C" && isFlagPassed("F") {
-		// Kalle opp funksjonen FahrenheitToCelsius(fahr), som da
-		// skal returnere °C
-		fmt.Println("0°F er -17.78°C")
-	}
+	//if out == "C" && isFlagPassed("F") {
+	// Kalle opp funksjonen FahrenheitToCelsius(fahr), som da
+	// skal returnere °C
+	//	fmt.Println("0°F er -17.78°C")
+	//}
 
 }
 
