@@ -1,3 +1,3 @@
-module github.com/RuneU/funtemps.git
+module github.com/RuneU/funtemps
 
-go 1.19
+go 1.20
