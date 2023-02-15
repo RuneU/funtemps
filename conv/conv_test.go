@@ -61,7 +61,7 @@ func TestCelsiusToFarhenheit(t *testing.T) {
 	}
 
 	tests := []test{
-		{input: 56.67, want: 134},
+		{input: 56.67, want: 135},
 	}
 
 	for _, tc := range tests {

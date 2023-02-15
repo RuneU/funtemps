@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"strings"
 
 	"github.com/RuneU/funtemps/conv"
 )
@@ -36,6 +37,43 @@ func init() {
 	// hvilken temperaturskala skal brukes når funfacts skal vises
 }
 
+/*func addThousandsSeparators(f float64) string {
+	s := fmt.Sprintf("%.0f", f)
+	if len(s) < 4 {
+		return s
+	}
+	result := make([]byte, 0, len(s)+int(len(s)/3))
+	start := len(s) % 3
+	if start == 0 {
+		start = 3
+	}
+	result = append(result, []byte(s[:start])...)
+	for i := start; i < len(s); i += 3 {
+		result = append(result, ' ')
+		result = append(result, []byte(s[i:i+3])...)
+	}
+	return string(result)
+}
+*/
+
+func addThousandsSeparators(f float64) string {
+	s := fmt.Sprintf("%.2f", f)
+	parts := strings.Split(s, ".")
+	integerPart := parts[0]
+	decimalPart := parts[1]
+	if len(integerPart) < 4 {
+		return s
+	}
+	var result string
+	for i := len(integerPart) - 1; i >= 0; i-- {
+		result = string(integerPart[i]) + result
+		if (len(integerPart)-i)%3 == 0 && i != 0 {
+			result = " " + result
+		}
+	}
+	return result + "." + decimalPart
+}
+
 func main() {
 
 	flag.Parse()
@@ -50,33 +88,44 @@ func main() {
 
 	if out == "C" && isFlagPassed("F") {
 		cel := conv.FarhenheitToCelsius(fahr)
-		fmt.Printf("%.2f°F is %.2f°C\n", fahr, cel)
+		fmt.Printf("%.0f°F is %s°C\n", fahr, addThousandsSeparators(cel))
 	}
 
 	if out == "F" && isFlagPassed("C") {
 		fahr := conv.CelsiusToFarhenheit(cel)
-		fmt.Printf("%.2f°C is %.2f°F\n", cel, fahr)
+		fmt.Printf("%.0f°C is %s°F\n", cel, addThousandsSeparators(fahr))
 	}
 
 	if out == "K" && isFlagPassed("C") {
 		kel := conv.CelsiusToKelvin(cel)
-		fmt.Printf("%.2f°C is %.2f°K\n", cel, kel)
+		fmt.Printf("%.0f°C is %s°K\n", cel, addThousandsSeparators(kel))
 	}
 
 	if out == "C" && isFlagPassed("K") {
 		cel := conv.KelvinToCelsius(kel)
-		fmt.Printf("%.2f°K is %.2f°C\n", kel, cel)
+		fmt.Printf("%.0f°K is %s°C\n", kel, addThousandsSeparators(cel))
 	}
 
 	if out == "F" && isFlagPassed("K") {
 		fahr := conv.KelvinToFarhenheit(kel)
-		fmt.Printf("%.2f°K is %.2f°F\n", kel, fahr)
+		fmt.Printf("%.0f°K is %s°F\n", kel, addThousandsSeparators(fahr))
 	}
 
 	if out == "K" && isFlagPassed("F") {
 		kelvin := conv.FarhenheitToKelvin(fahr)
-		fmt.Printf("%.2f°F is %.2f°K\n", fahr, kelvin)
+		fmt.Printf("%.0f°F is %s°K\n", fahr, addThousandsSeparators(kelvin))
 	}
+	/*if out == "K" && isFlagPassed("F") {
+		kel := conv.FarhenheitToKelvin(fahr)
+		fmt.Printf("%.0f°F is %s°K\n", fahr, addThousandsSeparators(kel))
+	}
+	*/
+	/*if out == "K" && isFlagPassed("F") {
+		kelvin := conv.FarhenheitToKelvin(fahr)
+		fmt.Printf("%.2f°F is %.0f°K\n", fahr, kelvin)
+	}
+	*/
+
 	/**
 	    Her må logikken for flaggene og kall til funksjoner fra conv og funfacts
 	    pakkene implementeres.
