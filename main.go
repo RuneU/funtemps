@@ -19,13 +19,6 @@ var cel float64
 // er initialisert.
 func init() {
 
-	/*
-	   Her er eksempler på hvordan man implementerer parsing av flagg.
-	   For eksempel, kommando
-	       funtemps -F 0 -out C
-	   skal returnere output: 0°F er -17.78°C
-	*/
-
 	// Definerer og initialiserer flagg-variablene
 	flag.Float64Var(&fahr, "F", 0.0, "temperatur i grader fahrenheit")
 	flag.Float64Var(&kel, "K", 0.0, "temperatur i grader kelvin")
@@ -37,124 +30,73 @@ func init() {
 	// hvilken temperaturskala skal brukes når funfacts skal vises
 }
 
-/*func addThousandsSeparators(f float64) string {
-	s := fmt.Sprintf("%.0f", f)
-	if len(s) < 4 {
-		return s
+func formatNumber(number float64) string {
+	numStr := fmt.Sprintf("%.2f", number)
+	numParts := strings.Split(numStr, ".")
+	intPart := numParts[0]
+	intPartLen := len(intPart)
+
+	// Remove trailing zeros after decimal point
+	decPart := strings.TrimRight(numParts[1], "0")
+	if decPart == "" {
+		return intPart
 	}
-	result := make([]byte, 0, len(s)+int(len(s)/3))
-	start := len(s) % 3
+
+	// Format integer part with thousands separators
+	if intPartLen <= 3 {
+		return intPart + "." + decPart
+	}
+
+	start := intPartLen % 3
 	if start == 0 {
 		start = 3
 	}
-	result = append(result, []byte(s[:start])...)
-	for i := start; i < len(s); i += 3 {
-		result = append(result, ' ')
-		result = append(result, []byte(s[i:i+3])...)
-	}
-	return string(result)
-}
-*/
 
-func addThousandsSeparators(f float64) string {
-	s := fmt.Sprintf("%.2f", f)
-	parts := strings.Split(s, ".")
-	integerPart := parts[0]
-	decimalPart := parts[1]
-	if len(integerPart) < 4 {
-		return s
-	}
 	var result string
-	for i := len(integerPart) - 1; i >= 0; i-- {
-		result = string(integerPart[i]) + result
-		if (len(integerPart)-i)%3 == 0 && i != 0 {
-			result = " " + result
+	for i, digit := range intPart {
+		if i == start {
+			result += " "
+			start += 3
 		}
+		result += string(digit)
 	}
-	return result + "." + decimalPart
+
+	return result + "." + decPart
 }
 
 func main() {
 
 	flag.Parse()
 
-	// Her er noen eksempler du kan bruke i den manuelle testingen
-	//fmt.Println(fahr, out, funfacts)
-
-	//fmt.Println("len(flag.Args())", len(flag.Args()))
-	//fmt.Println("flag.NFlag()", flag.NFlag())
-
-	//fmt.Println(isFlagPassed("out"))
-
 	if out == "C" && isFlagPassed("F") {
 		cel := conv.FarhenheitToCelsius(fahr)
-		fmt.Printf("%.0f°F is %s°C\n", fahr, addThousandsSeparators(cel))
+		fmt.Printf("%.2f°F is %s°C\n", fahr, formatNumber(cel))
 	}
 
 	if out == "F" && isFlagPassed("C") {
 		fahr := conv.CelsiusToFarhenheit(cel)
-		fmt.Printf("%.0f°C is %s°F\n", cel, addThousandsSeparators(fahr))
+		fmt.Printf("%.2f°C is %s°F\n", cel, formatNumber(fahr))
 	}
 
 	if out == "K" && isFlagPassed("C") {
 		kel := conv.CelsiusToKelvin(cel)
-		fmt.Printf("%.0f°C is %s°K\n", cel, addThousandsSeparators(kel))
+		fmt.Printf("%.2f°C is %s°K\n", cel, formatNumber(kel))
 	}
 
 	if out == "C" && isFlagPassed("K") {
 		cel := conv.KelvinToCelsius(kel)
-		fmt.Printf("%.0f°K is %s°C\n", kel, addThousandsSeparators(cel))
+		fmt.Printf("%.2f°K is %s°C\n", kel, formatNumber(cel))
 	}
 
 	if out == "F" && isFlagPassed("K") {
 		fahr := conv.KelvinToFarhenheit(kel)
-		fmt.Printf("%.0f°K is %s°F\n", kel, addThousandsSeparators(fahr))
+		fmt.Printf("%.2f°K is %s°F\n", kel, formatNumber(fahr))
 	}
 
 	if out == "K" && isFlagPassed("F") {
 		kelvin := conv.FarhenheitToKelvin(fahr)
-		fmt.Printf("%.0f°F is %s°K\n", fahr, addThousandsSeparators(kelvin))
+		fmt.Printf("%.v°F is %s°K\n", (fahr), formatNumber(kelvin))
 	}
-	/*if out == "K" && isFlagPassed("F") {
-		kel := conv.FarhenheitToKelvin(fahr)
-		fmt.Printf("%.0f°F is %s°K\n", fahr, addThousandsSeparators(kel))
-	}
-	*/
-	/*if out == "K" && isFlagPassed("F") {
-		kelvin := conv.FarhenheitToKelvin(fahr)
-		fmt.Printf("%.2f°F is %.0f°K\n", fahr, kelvin)
-	}
-	*/
-
-	/**
-	    Her må logikken for flaggene og kall til funksjoner fra conv og funfacts
-	    pakkene implementeres.
-
-	    Det er anbefalt å sette opp en tabell med alle mulige kombinasjoner
-	    av flagg. flag-pakken har funksjoner som man kan bruke for å teste
-	    hvor mange flagg og argumenter er spesifisert på kommandolinje.
-
-	        fmt.Println("len(flag.Args())", len(flag.Args()))
-			    fmt.Println("flag.NFlag()", flag.NFlag())
-
-	    Enkelte kombinasjoner skal ikke være gyldige og da må kontrollstrukturer
-	    brukes for å utelukke ugyldige kombinasjoner:
-	    -F, -C, -K kan ikke brukes samtidig
-	    disse tre kan brukes med -out, men ikke med -funfacts
-	    -funfacts kan brukes kun med -t
-	    ...
-	    Jobb deg gjennom alle tilfellene. Vær obs på at det er en del sjekk
-	    implementert i flag-pakken og at den vil skrive ut "Usage" med
-	    beskrivelsene av flagg-variablene, som angitt i parameter fire til
-	    funksjonene Float64Var og StringVar
-	*/
-	// Eksempel på enkel logikk
-	//if out == "C" && isFlagPassed("F") {
-	// Kalle opp funksjonen FahrenheitToCelsius(fahr), som da
-	// skal returnere °C
-	//	fmt.Println("0°F er -17.78°C")
-	//}
-
 }
 
 // Funksjonen sjekker om flagget er spesifisert på kommandolinje
