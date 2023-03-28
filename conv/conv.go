@@ -22,7 +22,7 @@ func FarhenheitToCelsius(fahr float64) float64 {
 
 // De andre konverteringsfunksjonene implementere her
 // ...
-func CelsiusToFarhenheit(cel float64) float64 {
+func CelsiusToFahrenheit(cel float64) float64 {
 	//Farhrenheit = Celsius*(9/5) + 32
 	var fahr = cel*9/5 + 32
 	return fahr
